@@ -1,0 +1,46 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>GoogleAnalytics.Blazor.Website.Server</PageTitle>
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    [Inject] private IGBAnalyticsManager Analytics { get; set; } = null;
+
+    private string userId = $"userid{DateTime.Now.Ticks}";
+    private Dictionary<string, object> globalConfigData = new();
+    private Dictionary<string, object> globalEventData = new();
+
+    protected override void OnInitialized()
+    {
+        var userId = $"userid{DateTime.Now.Ticks}";
+        globalConfigData["user_id"] = userId;
+        globalEventData["user_id"] = userId;
+    }
+
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        if (firstRender)
+        {
+            Analytics.ConfigureGlobalConfigData(globalConfigData);
+            Analytics.ConfigureGlobalEventData(globalEventData);
+        }
+    }
+}

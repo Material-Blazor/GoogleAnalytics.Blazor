@@ -1,0 +1,44 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+<p style="color: red; font-weight: bold"><input type="checkbox" @bind="@EnableGlobalTracking" /> Enable global GA tracking</p>
+
+<p>Welcome to your new app.</p>
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+@code {
+    [Inject] private IGBAnalyticsManager AnalyticsManager { get; set; }
+
+    private bool enableGlobalTracking;
+    private bool EnableGlobalTracking
+    {
+        get => enableGlobalTracking;
+        set
+        {
+            if (value != enableGlobalTracking)
+            {
+                enableGlobalTracking = value;
+
+                if (enableGlobalTracking)
+                {
+                    AnalyticsManager.EnableGlobalTracking();
+                }
+                else
+                {
+                    AnalyticsManager.DisableGlobalTracking();
+                }
+            }
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        enableGlobalTracking = AnalyticsManager.IsGlobalTrackingEnabled();
+    }
+}

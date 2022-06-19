@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+
+		<TypeScriptToolsVersion>latest</TypeScriptToolsVersion>
+
+		<RootNamespace>GoogleAnalytics.Blazor</RootNamespace>
+		<AssemblyName>GoogleAnalytics.Blazor</AssemblyName>
+
+		<IsPackable>true</IsPackable>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<Authors>isc30</Authors>
+		<Company>CodeIsc</Company>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageId>GoogleAnalytics.Blazor</PackageId>
+		<Product>GoogleAnalytics.Blazor</Product>
+		<Title>GoogleAnalytics.Blazor</Title>
+		<Description>Blazor extensions for Analytics. Supported platforms: Google Analytics, GTAG, ...</Description>
+		<PackageTags>blazor google analytics gtag extensions razor components</PackageTags>
+		<RepositoryUrl>https://github.com/isc30/blazor-analytics</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryType>git</RepositoryType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components" Version="6.0.6" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.6" />
+		<PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+	</ItemGroup>
+
+	<!-- TypeScript Build -->
+	<ItemGroup>
+		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.7.4">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<TypeScriptCompile Include="**/*.ts" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Update="tsconfig.json">
+			<Pack>false</Pack>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="wwwroot\" />
+	</ItemGroup>
+
+</Project>
