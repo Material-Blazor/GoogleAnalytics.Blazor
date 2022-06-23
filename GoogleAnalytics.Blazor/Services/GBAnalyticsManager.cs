@@ -35,18 +35,6 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     }
 
 
-    /// <summary>
-    /// Sets the tracking id.
-    /// </summary>
-    /// <param name="trackingId"></param>
-    public void Configure(string trackingId)
-    {
-        TrackingId = trackingId;
-
-        _ = OnLocationChanged(_navigationManager.Uri);
-    }
-
-
     private async Task InitializeAsync()
     {
         if (TrackingId == null)
@@ -59,6 +47,25 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
         IsInitialized = true;
 
         LogDebugMessage($"[GTAG][{TrackingId}] Configured!");
+    }
+
+
+    /// <inheritdoc/>
+    public void SetTrackingId(string trackingId)
+    {
+        TrackingId = trackingId;
+
+        if (!string.IsNullOrWhiteSpace(trackingId))
+        {
+            _ = OnLocationChanged(_navigationManager.Uri);
+        }
+    }
+
+
+    /// <inheritdoc/>
+    public string GetTrackingId()
+    {
+        return TrackingId ?? "";
     }
 
 
