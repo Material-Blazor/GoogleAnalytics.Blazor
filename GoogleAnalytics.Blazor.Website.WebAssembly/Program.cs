@@ -13,7 +13,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-builder.Services.AddGoogleAnalytics("UA-111742878-2");
+builder.Services.AddGBService("UA-111742878-2");
 
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 

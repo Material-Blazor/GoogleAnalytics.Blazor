@@ -11,6 +11,21 @@ namespace GoogleAnalytics.Blazor;
 public interface IGBAnalyticsManager
 {
     /// <summary>
+    /// Sets the tracking id.
+    /// </summary>
+    /// <param name="trackingId"></param>
+    /// <returns></returns>
+    void SetTrackingId(string trackingId);
+
+
+    /// <summary>
+    /// Gets the tracking id.
+    /// </summary>
+    /// <returns>The current tracking id</returns>
+    string GetTrackingId();
+
+
+    /// <summary>
     /// Remove Obsolete attribute once functionality is determined.
     /// </summary>
     /// <param name="globalConfigData"></param>

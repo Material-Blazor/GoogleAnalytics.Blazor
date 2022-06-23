@@ -14,7 +14,7 @@ public static class GoogleAnalyticsExtensions
     /// </summary>
     /// <param name="services"></param>
     /// <returns></returns>
-    public static IServiceCollection AddGoogleAnalytics(this IServiceCollection services) => AddGoogleAnalytics(services, null);
+    public static IServiceCollection AddGBService(this IServiceCollection services) => AddGBService(services, null);
 
 
     /// <summary>
@@ -25,7 +25,7 @@ public static class GoogleAnalyticsExtensions
     /// <param name="trackingId"></param>
     /// <param name="debug"></param>
     /// <returns></returns>
-    public static IServiceCollection AddGoogleAnalytics(this IServiceCollection services, string trackingId)
+    public static IServiceCollection AddGBService(this IServiceCollection services, string trackingId)
     {
         return services.AddScoped<IGBAnalyticsManager>(p =>
         {
@@ -40,7 +40,7 @@ public static class GoogleAnalyticsExtensions
 
             if (!string.IsNullOrWhiteSpace(trackingId))
             {
-                googleAnalytics.Configure(trackingId);
+                googleAnalytics.SetTrackingId(trackingId);
             }
 
             return googleAnalytics;
