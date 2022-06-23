@@ -113,7 +113,7 @@ jobs:
 ############################################################################################################
   create-release:
     name: Create release
-    needs: [ build-and-deploy-package, build-gab, branch, version, is-on-ga-blazor]
+    needs: [build-gab, branch, version, is-on-ga-blazor]
 
     runs-on: ubuntu-latest
 
