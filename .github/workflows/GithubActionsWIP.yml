@@ -1,0 +1,119 @@
+﻿name: GithubActionsWIP
+
+on:
+  push:
+    branches: [ main ]
+
+  pull_request:
+    branches: [ main ]
+
+env:
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  output: ${{github.workspace}}/output
+  project: 'GoogleAnalytics.Blazor/GoogleAnalytics.Blazor.csproj'
+
+jobs:
+
+############################################################################################################
+# This job is only to display some CI information
+############################################################################################################
+  info:
+    name: Display CI information
+    runs-on: windows-latest
+
+    steps:
+
+    - name: DotNet info
+      run: dotnet --info
+
+    - name: Get the branch
+      id: get_branch
+      run: echo ::set-output name=branch::${GITHUB_REF/refs\/heads\//}
+      shell: bash
+
+    - name: Get the pullrequest
+      id: get_pullrequest
+      run: echo ::set-output name=pullrequest::${GITHUB_REF/refs\/pull\//}
+      shell: bash
+
+    - name: Get the tag
+      id: get_tag
+      run: echo ::set-output name=tag::${GITHUB_REF/refs\/tags\//}
+      shell: bash
+
+    - name: Show branch name Ꙫ
+      run: echo GitHub indicates that this is a branch push request of ${{steps.get_branch.outputs.branch}}
+      if: contains(github.ref, 'refs/heads')
+
+    - name: Show PR name Ꙫ
+      run: echo GitHub indicates that this is a pull request called ${{steps.get_pullrequest.outputs.pullrequest}}
+      if: contains(github.ref, 'refs/pull')
+
+    - name: Show Tag name Ꙫ
+      run: echo GitHub indicates that this is a tag creation with ${{steps.get_tag.outputs.tag}}
+      if: contains(github.ref, 'refs/tag')
+
+############################################################################################################
+# Store the version information
+############################################################################################################
+  version:
+    name: Set version suffix
+    runs-on: ubuntu-latest
+
+    steps:
+    - id: get
+      run: |
+        echo "::set-output name=suffix::ci.$(date +'%Y-%m-%d--%H%M')"
+    - id: show
+      run: |
+        echo "${{ steps.get.outputs.suffix }}"
+    outputs:
+      suffix: ${{ steps.get.outputs.suffix }}
+      
+      
+############################################################################################################
+# Build GA.B
+############################################################################################################
+  build-gab:
+    name: Build GoogleAnalytics.Blazor
+    needs: [version]
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository under $GITHUB_WORKSPACE so the job can access it 🛎️
+      uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+
+    - name: Use prelease dotnet
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.x'
+        include-prerelease: true
+
+    - name: Publish GA.B 🔧
+      run: dotnet publish ${{env.project}} --configuration ${{env.buildConfiguration}} --output ${{env.output}} --version-suffix ${{needs.version.outputs.suffix}} -p:BlazorEnableCompression=false
+
+    - name: Generate the NuGet package 🔧
+      run: dotnet pack ${{env.project}} --no-build --configuration ${{env.buildConfiguration}} --output ${{env.output}} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg --version-suffix ${{needs.version.outputs.suffix}}
+
+    - name: Display package output Ꙫ
+      run: dir ${{env.output}}
+
+# We'd like to push to a the main repository but now getting errors of authorization
+
+    - name: Upload Package (Main repository) 🔺
+      run: nuget push ${{env.output}}\*.nupkg -Source https://nuget.pkg.github.com/${{github.repository_owner}}/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      if: (github.repository == 'Material-Blazor/GoogleAnalytics.Blazor') && (github.event_name == 'push') && false
+
+# We'd like to push to a forked repository; The push appears to work but the packages are not visible
+# Pending a service response we only do the push of the CI build in the Material-Blazor/GoogleAnalytics.Blazor repository
+
+    - name: Upload Package (Forked repository) 🔺
+      run: nuget push ${{env.output}}\*.nupkg -Source https://nuget.pkg.github.com/${{github.repository_owner}}/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.GH_PAT}}
+      if: (github.repository != 'Material-Blazor/GoogleAnalytics.Blazor') && (github.event_name == 'push') && false
