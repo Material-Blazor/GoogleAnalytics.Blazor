@@ -21,11 +21,11 @@ builder.Services.AddSingleton<WeatherForecastService>();
 
 builder.Services.AddGBService(
     "UA-111742878-2",
-    new Dictionary<string, object>()
+    additionalConfigInfo: new Dictionary<string, object>()
     {
         { "user_id", userId }
     },
-    new Dictionary<string, object>()
+    globalEventParams: new Dictionary<string, object>()
     {
         { "user_id", userId }
     });

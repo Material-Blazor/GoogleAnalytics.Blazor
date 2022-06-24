@@ -3,17 +3,27 @@ using GoogleAnalytics.Blazor.Website.WebAssembly;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Serilog;
-using Serilog.Core;
-using Serilog.Events;
 using Serilog.Extensions.Logging;
 
+var userId = $"userid{DateTime.Now.Ticks}";
+
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-builder.Services.AddGBService("UA-111742878-2");
+builder.Services.AddGBService(
+    "UA-111742878-2",
+    additionalConfigInfo: new Dictionary<string, object>()
+    {
+        { "user_id", userId }
+    },
+    globalEventParams: new Dictionary<string, object>()
+    {
+        { "user_id", userId }
+    });
 
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
