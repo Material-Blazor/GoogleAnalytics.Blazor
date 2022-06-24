@@ -11,27 +11,31 @@ namespace GoogleAnalytics.Blazor;
 public static class GoogleAnalyticsExtensions
 {
     /// <summary>
-    /// Adds a scoped service to manage Google Analytics. If the tracking id is null or whitespace, a tracking
-    /// id is set from configuration["GoogleAnalytics.Blazor:TrackingId"] if set.
+    /// Adds a scoped service to manage Google Analytics.
     /// </summary>
     /// <param name="services"></param>
     /// <param name="trackingId"></param>
     /// <param name="additionalConfigInfo">See <see href="https://developers.google.com/tag-platform/gtagjs/reference#config"/></param>
     /// <returns></returns>
-    public static IServiceCollection AddGBService(this IServiceCollection services, string trackingId = null, IDictionary<string, object> additionalConfigInfo = null)
+    public static IServiceCollection AddGBService(this IServiceCollection services, string trackingId = null, IDictionary<string, object> additionalConfigInfo = null, IDictionary<string, object> globalEventParams = null)
     {
         return services.AddScoped<IGBAnalyticsManager>(p =>
         {
             var googleAnalytics = ActivatorUtilities.CreateInstance<GBAnalyticsManager>(p);
+
+            if (!string.IsNullOrWhiteSpace(trackingId))
+            {
+                _ = googleAnalytics.SetTrackingId(trackingId);
+            }
 
             if (additionalConfigInfo != null)
             {
                 _ = googleAnalytics.SetAdditionalConfigInfo(additionalConfigInfo);
             }
 
-            if (!string.IsNullOrWhiteSpace(trackingId))
+            if (globalEventParams != null)
             {
-                _ = googleAnalytics.SetTrackingId(trackingId);
+                googleAnalytics.SetGlobalEventParams(globalEventParams);
             }
 
             return googleAnalytics;

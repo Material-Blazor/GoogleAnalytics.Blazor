@@ -19,10 +19,16 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 
-builder.Services.AddGBService("UA-111742878-2", new Dictionary<string, object>()
-{
-    { "user_id", userId }
-});
+builder.Services.AddGBService(
+    "UA-111742878-2",
+    new Dictionary<string, object>()
+    {
+        { "user_id", userId }
+    },
+    new Dictionary<string, object>()
+    {
+        { "user_id", userId }
+    });
 
 var app = builder.Build();
 

@@ -25,7 +25,7 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     private bool SuppressNextPageHit { get; set; } = false;
     private string TrackingId { get; set; } = null;
     private ImmutableDictionary<string, object> AdditionalConfigInfo { get; set; } = ImmutableDictionary<string, object>.Empty;
-    private Dictionary<string, object> GlobalEventData { get; set; } = new();
+    private ImmutableDictionary<string, object> GlobalEventParams { get; set; } = ImmutableDictionary<string, object>.Empty;
     private bool IsConfigured { get; set; } = false;
     private bool IsInitialized { get; set; } = false;
 
@@ -133,10 +133,16 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
 
 
     /// <inheritdoc/>
-    public Task ConfigureGlobalEventData(Dictionary<string, object> globalEventData)
+    public void SetGlobalEventParams(IDictionary<string, object> globalEventParams)
     {
-        GlobalEventData = globalEventData;
-        return Task.CompletedTask;
+        GlobalEventParams = globalEventParams.OrderBy(x => x.Key).ToImmutableDictionary();
+    }
+
+
+    /// <inheritdoc/>
+    public ImmutableDictionary<string, object> GetGlobalEventParams()
+    {
+        return GlobalEventParams;
     }
 
 
@@ -172,7 +178,7 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
             await ConfigureAsync().ConfigureAwait(false);
         }
 
-        await _jsRuntime.InvokeAsync<string>( GoogleAnalyticsInterop.TrackEvent, eventName, eventData, GlobalEventData).ConfigureAwait(false);
+        await _jsRuntime.InvokeAsync<string>( GoogleAnalyticsInterop.TrackEvent, eventName, eventData, GlobalEventParams).ConfigureAwait(false);
 
         LogDebugMessage($"[GTAG][Event triggered] '{eventName}, {eventData}'");
     }

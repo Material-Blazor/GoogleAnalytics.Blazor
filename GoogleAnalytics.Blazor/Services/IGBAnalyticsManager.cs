@@ -43,12 +43,20 @@ public interface IGBAnalyticsManager
 
 
     /// <summary>
-    /// Remove Obsolete attribute once functionality is determined.
+    /// Sets event parameters to be used for every event tracked. Any event tracked can add further event parameters.
+    /// See <see href="https://developers.google.com/tag-platform/gtagjs/reference#event"/>.
     /// </summary>
-    /// <param name="globalConfigData"></param>
+    /// <param name="globalEventParams"></param>
     /// <returns></returns>
-    [Obsolete]
-    public Task ConfigureGlobalEventData(Dictionary<string, object> globalEventData);
+    public void SetGlobalEventParams(IDictionary<string, object> globalEventParams);
+
+
+    /// <summary>
+    /// Gets event parameters to be used for every event tracked. Any event tracked can add further event parameters.
+    /// See <see href="https://developers.google.com/tag-platform/gtagjs/reference#event"/>.
+    /// </summary>
+    /// <returns></returns>
+    public ImmutableDictionary<string, object> GetGlobalEventParams();
 
 
     /// <summary>
