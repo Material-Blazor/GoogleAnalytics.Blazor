@@ -113,7 +113,7 @@ protected override void OnInitialized()
 ```csharp
 protected override void OnInitialized()
 {
-    GlobalTracking.DisableGlobalTracking();
+    AnalyticsManager.DisableGlobalTracking();
 }
 ```
 
@@ -122,7 +122,7 @@ protected override void OnInitialized()
 ```csharp
 protected override void OnInitialized()
 {
-    GlobalTracking.EnableGlobalTracking();
+    AnalyticsManager.EnableGlobalTracking();
 }
 ```
   
