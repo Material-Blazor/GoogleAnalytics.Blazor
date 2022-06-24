@@ -3,6 +3,8 @@ using GoogleAnalytics.Blazor.Website.Server.Data;
 using Serilog;
 using Serilog.Events;
 
+var userId = $"userid{DateTime.Now.Ticks}";
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((ctx, lc) => lc
@@ -17,7 +19,16 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 
-builder.Services.AddGBService();
+builder.Services.AddGBService(
+    "UA-111742878-2",
+    additionalConfigInfo: new Dictionary<string, object>()
+    {
+        { "user_id", userId }
+    },
+    globalEventParams: new Dictionary<string, object>()
+    {
+        { "user_id", userId }
+    });
 
 var app = builder.Build();
 

@@ -9,11 +9,11 @@ interface ObjectConstructor {
     assign(...objects: Object[]): Object;
 }
 
-interface ConfigObject {
+interface AdditionalConfigInfoObject {
     [key: string]: any
 }
 
-interface EventDataObject {
+interface EventParamsObject {
     [key: string]: any
 }
 
@@ -31,35 +31,35 @@ gtag("js", new Date());
 
 namespace GoogleAnalyticsInterop
 {
-    export function configure(trackingId: string, globalConfigObject: ConfigObject): void
+    export function configure(trackingId: string, additionalConfigInfo: AdditionalConfigInfoObject): void
     {
-        this.globalConfigObject = globalConfigObject;
+        this.additionalConfigInfo = additionalConfigInfo;
         const script = document.createElement("script");
         script.async = true;
         script.src = "https://www.googletagmanager.com/gtag/js?id=" + trackingId;
 
         document.head.appendChild(script);
 
-        let configObject: ConfigObject = {};
+        let configObject: AdditionalConfigInfoObject = {};
         configObject.send_page_view = false;
-        Object.assign(configObject, globalConfigObject)
+        Object.assign(configObject, additionalConfigInfo)
 
         gtag("config", trackingId, configObject);
     }
 
     export function navigate(trackingId: string, href: string): void
     {
-        let configObject: ConfigObject = {};
+        let configObject: AdditionalConfigInfoObject = {};
 
         configObject.page_location = href;
-        Object.assign(configObject, this.globalConfigObject)
+        Object.assign(configObject, this.additionalConfigInfo)
         gtag("config", trackingId, configObject);
     }
 
-    export function trackEvent(eventName: string, eventData: EventDataObject, globalEventData: EventDataObject)
+    export function trackEvent(eventName: string, eventParams: EventParamsObject, globalEventParams: EventParamsObject)
     {
-        Object.assign(eventData, globalEventData)
+        Object.assign(eventParams, globalEventParams)
 
-        gtag("event", eventName, eventData);
+        gtag("event", eventName, eventParams);
     }
 }

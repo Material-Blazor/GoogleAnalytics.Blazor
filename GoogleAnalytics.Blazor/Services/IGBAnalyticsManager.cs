@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace GoogleAnalytics.Blazor;
@@ -15,89 +16,96 @@ public interface IGBAnalyticsManager
     /// </summary>
     /// <param name="trackingId"></param>
     /// <returns></returns>
-    void SetTrackingId(string trackingId);
+    public Task SetTrackingId(string trackingId);
 
 
     /// <summary>
     /// Gets the tracking id.
     /// </summary>
     /// <returns>The current tracking id</returns>
-    string GetTrackingId();
+    public string GetTrackingId();
 
 
     /// <summary>
-    /// Remove Obsolete attribute once functionality is determined.
+    /// Sets additional config info. See <see href="https://developers.google.com/tag-platform/gtagjs/reference#config"/>.
     /// </summary>
-    /// <param name="globalConfigData"></param>
+    /// <param name="additionalConfigInfo"></param>
     /// <returns></returns>
-    [Obsolete]
-    Task ConfigureGlobalConfigData(Dictionary<string, object> globalConfigData);
+    public Task SetAdditionalConfigInfo(IDictionary<string, object> additionalConfigInfo);
 
 
     /// <summary>
-    /// Remove Obsolete attribute once functionality is determined.
+    /// Gets additional config info. See <see href="https://developers.google.com/tag-platform/gtagjs/reference#config"/>.
     /// </summary>
-    /// <param name="globalConfigData"></param>
+    /// <param name="additionalConfigInfo"></param>
     /// <returns></returns>
-    [Obsolete]
-    Task ConfigureGlobalEventData(Dictionary<string, object> globalEventData);
+    public ImmutableDictionary<string, object> GetAdditionalConfigInfo();
 
 
     /// <summary>
-    /// Tracks navigation to a new endpoint.
+    /// Sets event parameters to be used for every event tracked. Any event tracked can add further event parameters.
+    /// See <see href="https://developers.google.com/tag-platform/gtagjs/reference#event"/>.
     /// </summary>
-    /// <param name="uri"></param>
+    /// <param name="globalEventParams"></param>
     /// <returns></returns>
-    Task TrackNavigation(string uri);
+    public void SetGlobalEventParams(IDictionary<string, object> globalEventParams);
 
 
     /// <summary>
-    /// Tracks an event to Google Analytics. See https://developers.google.com/analytics/devguides/collection/ga4/reference/events for a generic GA events.
+    /// Gets event parameters to be used for every event tracked. Any event tracked can add further event parameters.
+    /// See <see href="https://developers.google.com/tag-platform/gtagjs/reference#event"/>.
+    /// </summary>
+    /// <returns></returns>
+    public ImmutableDictionary<string, object> GetGlobalEventParams();
+
+
+    /// <summary>
+    /// Tracks an event to Google Analytics. See <see href="https://developers.google.com/analytics/devguides/collection/ga4/reference/events"/> for a generic GA events.
     /// </summary>
     /// <param name="eventName"></param>
     /// <param name="eventCategory"></param>
     /// <param name="eventLabel"></param>
     /// <param name="eventValue"></param>
     /// <returns></returns>
-    Task TrackEvent(string eventName, string eventCategory = null, string eventLabel = null, int? eventValue = null);
+    public Task TrackEvent(string eventName, string eventCategory = null, string eventLabel = null, int? eventValue = null);
 
 
     /// <summary>
-    /// Tracks an event to Google Analytics. See https://developers.google.com/analytics/devguides/collection/ga4/reference/events for a generic GA events.
+    /// Tracks an event to Google Analytics. See <see href="https://developers.google.com/analytics/devguides/collection/ga4/reference/events"/> for a generic GA events.
     /// </summary>
     /// <param name="eventName"></param>
     /// <param name="eventValue"></param>
     /// <param name="eventCategory"></param>
     /// <param name="eventLabel"></param>
     /// <returns></returns>
-    Task TrackEvent(string eventName, int eventValue, string eventCategory = null, string eventLabel = null);
+    public Task TrackEvent(string eventName, int eventValue, string eventCategory = null, string eventLabel = null);
 
 
     /// <summary>
-    /// Tracks an event to Google Analytics. See https://developers.google.com/analytics/devguides/collection/ga4/reference/events for a generic GA events.
+    /// Tracks an event to Google Analytics. See <see href="https://developers.google.com/analytics/devguides/collection/ga4/reference/events"/> for a generic GA events.
     /// </summary>
     /// <param name="eventName"></param>
     /// <param name="eventData"></param>
     /// <returns></returns>
-    Task TrackEvent(string eventName, object eventData);
+    public Task TrackEvent(string eventName, object eventData);
 
 
     /// <summary>
     /// Enable global tracking.
     /// </summary>
-    void EnableGlobalTracking();
+    public void EnableGlobalTracking();
 
 
     /// <summary>
     /// Disable global tracking.
     /// </summary>
-    void DisableGlobalTracking();
+    public void DisableGlobalTracking();
 
 
     /// <summary>
     /// True if global tracking is enabled.
     /// </summary>
-    bool IsGlobalTrackingEnabled();
+    public bool IsGlobalTrackingEnabled();
 
 
     /// <summary>
@@ -106,5 +114,5 @@ public interface IGBAnalyticsManager
     /// or <see cref="Microsoft.AspNetCore.Components.ComponentBase.OnInitializedAsync"/> to suppress
     /// that page's tracking.
     /// </summary>
-    public void SuppressPageHitTracking();
+    public void SuppressNextPageHitTracking();
 }
