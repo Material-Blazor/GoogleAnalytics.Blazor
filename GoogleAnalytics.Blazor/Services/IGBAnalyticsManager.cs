@@ -26,12 +26,11 @@ public interface IGBAnalyticsManager
 
 
     /// <summary>
-    /// Remove Obsolete attribute once functionality is determined.
+    /// Sets additional config info. See <see href="https://developers.google.com/tag-platform/gtagjs/reference#config"/>.
     /// </summary>
-    /// <param name="globalConfigData"></param>
+    /// <param name="additionalConfigInfo"></param>
     /// <returns></returns>
-    [Obsolete]
-    Task ConfigureGlobalConfigData(Dictionary<string, object> globalConfigData);
+    Task SetAdditionalConfigInfo(IDictionary<string, object> additionalConfigInfo);
 
 
     /// <summary>
@@ -52,7 +51,7 @@ public interface IGBAnalyticsManager
 
 
     /// <summary>
-    /// Tracks an event to Google Analytics. See https://developers.google.com/analytics/devguides/collection/ga4/reference/events for a generic GA events.
+    /// Tracks an event to Google Analytics. See <see href="https://developers.google.com/analytics/devguides/collection/ga4/reference/events"/> for a generic GA events.
     /// </summary>
     /// <param name="eventName"></param>
     /// <param name="eventCategory"></param>
@@ -63,7 +62,7 @@ public interface IGBAnalyticsManager
 
 
     /// <summary>
-    /// Tracks an event to Google Analytics. See https://developers.google.com/analytics/devguides/collection/ga4/reference/events for a generic GA events.
+    /// Tracks an event to Google Analytics. See <see href="https://developers.google.com/analytics/devguides/collection/ga4/reference/events"/> for a generic GA events.
     /// </summary>
     /// <param name="eventName"></param>
     /// <param name="eventValue"></param>
@@ -74,7 +73,7 @@ public interface IGBAnalyticsManager
 
 
     /// <summary>
-    /// Tracks an event to Google Analytics. See https://developers.google.com/analytics/devguides/collection/ga4/reference/events for a generic GA events.
+    /// Tracks an event to Google Analytics. See <see href="https://developers.google.com/analytics/devguides/collection/ga4/reference/events"/> for a generic GA events.
     /// </summary>
     /// <param name="eventName"></param>
     /// <param name="eventData"></param>

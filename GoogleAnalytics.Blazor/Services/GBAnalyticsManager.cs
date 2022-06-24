@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
@@ -20,7 +21,7 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     private bool PerformGlobalTracking { get; set; } = true;
     private bool SuppressPageHits { get; set; } = false;
     private string TrackingId { get; set; } = null;
-    private Dictionary<string, object> GlobalConfigData { get; set; } = new();
+    private ImmutableDictionary<string, object> AdditionalConfiInfo { get; set; } = ImmutableDictionary<string, object>.Empty;
     private Dictionary<string, object> GlobalEventData { get; set; } = new();
     private bool IsInitialized { get; set; } = false;
 
@@ -42,7 +43,7 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
             throw new InvalidOperationException("Invalid TrackingId");
         }
 
-        await _jsRuntime.InvokeAsync<string>(GoogleAnalyticsInterop.Configure, TrackingId, GlobalConfigData);
+        await _jsRuntime.InvokeAsync<string>(GoogleAnalyticsInterop.Configure, TrackingId, AdditionalConfiInfo);
         
         IsInitialized = true;
 
@@ -70,11 +71,11 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
 
 
     /// <inheritdoc/>
-    public async Task ConfigureGlobalConfigData(Dictionary<string, object> globalConfigData)
+    public async Task SetAdditionalConfigInfo(IDictionary<string, object> additionalConfigInfo)
     {
         if (!IsInitialized)
         {
-            GlobalConfigData = globalConfigData;
+            AdditionalConfiInfo = additionalConfigInfo.ToImmutableDictionary();
 
             await InitializeAsync().ConfigureAwait(false);
         }
