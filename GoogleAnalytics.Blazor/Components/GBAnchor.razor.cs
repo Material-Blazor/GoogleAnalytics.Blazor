@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 
 namespace GoogleAnalytics.Blazor;
 
@@ -8,6 +8,15 @@ namespace GoogleAnalytics.Blazor;
 /// </summary>
 public class GBAnchor : ComponentBase
 {
-    [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Injected to ensure  service startup startup")]
     [Inject] private IGBAnalyticsManager GBAnalyticsManager { get; set; }
+
+
+    /// <inheritdoc/>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await (GBAnalyticsManager as GBAnalyticsManager).Initialize().ConfigureAwait(false);
+        }
+    }
 }

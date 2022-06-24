@@ -47,7 +47,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        AnalyticsManager.SuppressPageHitTracking();
+        AnalyticsManager.SuppressNextPageHitTracking();
 
         forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
     }

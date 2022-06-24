@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace GoogleAnalytics.Blazor;
 
@@ -17,22 +18,20 @@ public static class GoogleAnalyticsExtensions
     /// <param name="trackingId"></param>
     /// <param name="additionalConfigInfo">See <see href="https://developers.google.com/tag-platform/gtagjs/reference#config"/></param>
     /// <returns></returns>
-    public static IServiceCollection AddGBService(this IServiceCollection services, string trackingId = null, IDictionary additionalConfigInfo = null)
+    public static IServiceCollection AddGBService(this IServiceCollection services, string trackingId = null, IDictionary<string, object> additionalConfigInfo = null)
     {
         return services.AddScoped<IGBAnalyticsManager>(p =>
         {
             var googleAnalytics = ActivatorUtilities.CreateInstance<GBAnalyticsManager>(p);
 
-            var tiSection = services.BuildServiceProvider().GetService<IConfiguration>().GetSection("GoogleAnalytics.Blazor:TrackingId");
-
-            if (string.IsNullOrWhiteSpace(trackingId))
+            if (additionalConfigInfo != null)
             {
-                trackingId = tiSection.Value;
+                _ = googleAnalytics.SetAdditionalConfigInfo(additionalConfigInfo);
             }
 
             if (!string.IsNullOrWhiteSpace(trackingId))
             {
-                googleAnalytics.SetTrackingId(trackingId);
+                _ = googleAnalytics.SetTrackingId(trackingId);
             }
 
             return googleAnalytics;

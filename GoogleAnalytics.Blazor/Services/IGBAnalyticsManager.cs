@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace GoogleAnalytics.Blazor;
@@ -15,14 +16,14 @@ public interface IGBAnalyticsManager
     /// </summary>
     /// <param name="trackingId"></param>
     /// <returns></returns>
-    void SetTrackingId(string trackingId);
+    public Task SetTrackingId(string trackingId);
 
 
     /// <summary>
     /// Gets the tracking id.
     /// </summary>
     /// <returns>The current tracking id</returns>
-    string GetTrackingId();
+    public string GetTrackingId();
 
 
     /// <summary>
@@ -30,7 +31,15 @@ public interface IGBAnalyticsManager
     /// </summary>
     /// <param name="additionalConfigInfo"></param>
     /// <returns></returns>
-    Task SetAdditionalConfigInfo(IDictionary<string, object> additionalConfigInfo);
+    public Task SetAdditionalConfigInfo(IDictionary<string, object> additionalConfigInfo);
+
+
+    /// <summary>
+    /// Gets additional config info. See <see href="https://developers.google.com/tag-platform/gtagjs/reference#config"/>.
+    /// </summary>
+    /// <param name="additionalConfigInfo"></param>
+    /// <returns></returns>
+    public ImmutableDictionary<string, object> GetAdditionalConfigInfo();
 
 
     /// <summary>
@@ -39,15 +48,7 @@ public interface IGBAnalyticsManager
     /// <param name="globalConfigData"></param>
     /// <returns></returns>
     [Obsolete]
-    Task ConfigureGlobalEventData(Dictionary<string, object> globalEventData);
-
-
-    /// <summary>
-    /// Tracks navigation to a new endpoint.
-    /// </summary>
-    /// <param name="uri"></param>
-    /// <returns></returns>
-    Task TrackNavigation(string uri);
+    public Task ConfigureGlobalEventData(Dictionary<string, object> globalEventData);
 
 
     /// <summary>
@@ -58,7 +59,7 @@ public interface IGBAnalyticsManager
     /// <param name="eventLabel"></param>
     /// <param name="eventValue"></param>
     /// <returns></returns>
-    Task TrackEvent(string eventName, string eventCategory = null, string eventLabel = null, int? eventValue = null);
+    public Task TrackEvent(string eventName, string eventCategory = null, string eventLabel = null, int? eventValue = null);
 
 
     /// <summary>
@@ -69,7 +70,7 @@ public interface IGBAnalyticsManager
     /// <param name="eventCategory"></param>
     /// <param name="eventLabel"></param>
     /// <returns></returns>
-    Task TrackEvent(string eventName, int eventValue, string eventCategory = null, string eventLabel = null);
+    public Task TrackEvent(string eventName, int eventValue, string eventCategory = null, string eventLabel = null);
 
 
     /// <summary>
@@ -78,25 +79,25 @@ public interface IGBAnalyticsManager
     /// <param name="eventName"></param>
     /// <param name="eventData"></param>
     /// <returns></returns>
-    Task TrackEvent(string eventName, object eventData);
+    public Task TrackEvent(string eventName, object eventData);
 
 
     /// <summary>
     /// Enable global tracking.
     /// </summary>
-    void EnableGlobalTracking();
+    public void EnableGlobalTracking();
 
 
     /// <summary>
     /// Disable global tracking.
     /// </summary>
-    void DisableGlobalTracking();
+    public void DisableGlobalTracking();
 
 
     /// <summary>
     /// True if global tracking is enabled.
     /// </summary>
-    bool IsGlobalTrackingEnabled();
+    public bool IsGlobalTrackingEnabled();
 
 
     /// <summary>
@@ -105,5 +106,5 @@ public interface IGBAnalyticsManager
     /// or <see cref="Microsoft.AspNetCore.Components.ComponentBase.OnInitializedAsync"/> to suppress
     /// that page's tracking.
     /// </summary>
-    public void SuppressPageHitTracking();
+    public void SuppressNextPageHitTracking();
 }

@@ -22,13 +22,11 @@
     [Inject] private IGBAnalyticsManager Analytics { get; set; } = null;
 
     private string userId = $"userid{DateTime.Now.Ticks}";
-    private Dictionary<string, object> additionalConfigInfo = new();
     private Dictionary<string, object> globalEventData = new();
 
     protected override void OnInitialized()
     {
         var userId = $"userid{DateTime.Now.Ticks}";
-        additionalConfigInfo["user_id"] = userId;
         globalEventData["user_id"] = userId;
     }
 
@@ -39,7 +37,6 @@
 
         if (firstRender)
         {
-            Analytics.SetAdditionalConfigInfo(additionalConfigInfo);
             Analytics.ConfigureGlobalEventData(globalEventData);
         }
     }

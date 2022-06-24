@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 
@@ -17,12 +18,15 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     private readonly IJSRuntime _jsRuntime;
     private readonly NavigationManager _navigationManager;
     private readonly ILogger<GBAnalyticsManager> _logger;
+    private readonly SemaphoreSlim _configurationSemaphore = new(1, 1);
+    private readonly SemaphoreSlim _setPropertySemaphore = new(1, 1);
 
     private bool PerformGlobalTracking { get; set; } = true;
-    private bool SuppressPageHits { get; set; } = false;
+    private bool SuppressNextPageHit { get; set; } = false;
     private string TrackingId { get; set; } = null;
-    private ImmutableDictionary<string, object> AdditionalConfiInfo { get; set; } = ImmutableDictionary<string, object>.Empty;
+    private ImmutableDictionary<string, object> AdditionalConfigInfo { get; set; } = ImmutableDictionary<string, object>.Empty;
     private Dictionary<string, object> GlobalEventData { get; set; } = new();
+    private bool IsConfigured { get; set; } = false;
     private bool IsInitialized { get; set; } = false;
 
 
@@ -36,29 +40,38 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     }
 
 
-    private async Task InitializeAsync()
+    /// <summary>
+    /// Initializes the service. No tracking will be performed until this is called by <see cref="GBAnchor"/>;
+    /// </summary>
+    internal async Task Initialize()
     {
-        if (TrackingId == null)
-        {
-            throw new InvalidOperationException("Invalid TrackingId");
-        }
-
-        await _jsRuntime.InvokeAsync<string>(GoogleAnalyticsInterop.Configure, TrackingId, AdditionalConfiInfo);
-        
         IsInitialized = true;
 
-        LogDebugMessage($"[GTAG][{TrackingId}] Configured!");
+        await ConfigureAsync().ConfigureAwait(false);
     }
 
 
     /// <inheritdoc/>
-    public void SetTrackingId(string trackingId)
+    public async Task SetTrackingId(string trackingId)
     {
-        TrackingId = trackingId;
-
-        if (!string.IsNullOrWhiteSpace(trackingId))
+        if (TrackingId == trackingId)
         {
-            _ = OnLocationChanged(_navigationManager.Uri);
+            return;
+        }
+
+        await _setPropertySemaphore.WaitAsync().ConfigureAwait(false);
+
+        try
+        {
+            TrackingId = trackingId;
+
+            IsConfigured = false;
+
+            await ConfigureAsync().ConfigureAwait(false);
+        }
+        finally
+        {
+            _setPropertySemaphore.Release();
         }
     }
 
@@ -73,12 +86,49 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     /// <inheritdoc/>
     public async Task SetAdditionalConfigInfo(IDictionary<string, object> additionalConfigInfo)
     {
-        if (!IsInitialized)
+        try
         {
-            AdditionalConfiInfo = additionalConfigInfo.ToImmutableDictionary();
+            var newDict = additionalConfigInfo.OrderBy(x => x.Key).ToImmutableDictionary();
 
-            await InitializeAsync().ConfigureAwait(false);
+            var isNew = newDict.Count != AdditionalConfigInfo.Count;
+
+            if (!isNew)
+            {
+                using var newEnumerator = newDict.GetEnumerator();
+                using var oldEnumerator = AdditionalConfigInfo.GetEnumerator();
+
+                while (newEnumerator.MoveNext())
+                {
+                    oldEnumerator.MoveNext();
+
+                    if (newEnumerator.Current.Key != oldEnumerator.Current.Key || newEnumerator.Current.Value != oldEnumerator.Current.Value)
+                    {
+                        isNew = true;
+                        break;
+                    }
+                }
+            }
+
+            if (isNew)
+            {
+                AdditionalConfigInfo = newDict;
+
+                IsConfigured = false;
+
+                await ConfigureAsync().ConfigureAwait(false);
+            }
         }
+        finally
+        {
+            _setPropertySemaphore.Release();
+        }
+    }
+
+
+    /// <inheritdoc/>
+    public ImmutableDictionary<string, object> GetAdditionalConfigInfo()
+    {
+        return AdditionalConfigInfo;
     }
 
 
@@ -87,25 +137,6 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     {
         GlobalEventData = globalEventData;
         return Task.CompletedTask;
-    }
-
-
-    /// <inheritdoc/>
-    public async Task TrackNavigation(string uri)
-    {
-        if (!PerformGlobalTracking)
-        {
-            return;
-        }
-
-        if (!IsInitialized)
-        {
-            await InitializeAsync().ConfigureAwait(false);
-        }
-
-        await _jsRuntime.InvokeAsync<string>(GoogleAnalyticsInterop.Navigate, TrackingId, uri).ConfigureAwait(false);
-
-        LogDebugMessage($"[GTAG][{TrackingId}] Navigated: '{uri}'");
     }
 
 
@@ -136,9 +167,9 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
             return;
         }
 
-        if (!IsInitialized)
+        if (!IsConfigured)
         {
-            await InitializeAsync().ConfigureAwait(false);
+            await ConfigureAsync().ConfigureAwait(false);
         }
 
         await _jsRuntime.InvokeAsync<string>( GoogleAnalyticsInterop.TrackEvent, eventName, eventData, GlobalEventData).ConfigureAwait(false);
@@ -169,29 +200,69 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
 
 
     /// <inheritdoc/>
-    public void SuppressPageHitTracking()
+    public void SuppressNextPageHitTracking()
     {
-        SuppressPageHits = true;
+        SuppressNextPageHit = true;
+    }
+
+
+    private async Task ConfigureAsync()
+    {
+        if (!IsInitialized)
+        {
+            return;
+        }
+
+        await _configurationSemaphore.WaitAsync().ConfigureAwait(false);
+
+        try
+        {
+            if (IsConfigured || string.IsNullOrWhiteSpace(TrackingId))
+            {
+                return;
+            }
+
+            await _jsRuntime.InvokeAsync<string>(GoogleAnalyticsInterop.Configure, TrackingId, AdditionalConfigInfo);
+
+            IsConfigured = true;
+
+            LogDebugMessage($"[GTAG][{TrackingId}] Configured");
+
+            await TrackNavigation(_navigationManager.Uri).ConfigureAwait(false);
+        }
+        finally
+        {
+            _configurationSemaphore.Release();
+        }
     }
 
 
     private async void OnLocationChanged(object sender, LocationChangedEventArgs args)
     {
-        await OnLocationChanged(args.Location).ConfigureAwait(false);
-    }
-
-
-    private async Task OnLocationChanged(string location)
-    {
-        if (!string.IsNullOrWhiteSpace(TrackingId) && !SuppressPageHits)
+        await ConfigureAsync().ConfigureAwait(false);
+        
+        if (!SuppressNextPageHit)
         {
-            await TrackNavigation(location);
+            await TrackNavigation(args.Location);
         }
 
-        SuppressPageHits = false;
+        SuppressNextPageHit = false;
     }
 
-    
+
+    private async Task TrackNavigation(string uri)
+    {
+        if (!IsConfigured || !PerformGlobalTracking)
+        {
+            return;
+        }
+
+        await _jsRuntime.InvokeAsync<string>(GoogleAnalyticsInterop.Navigate, TrackingId, uri).ConfigureAwait(false);
+
+        LogDebugMessage($"[GTAG][{TrackingId}] Navigated: '{uri}'");
+    }
+
+
     private void LogDebugMessage(string message)
     {
         _logger.LogDebug(message);
