@@ -2,26 +2,29 @@
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
-
 		<TypeScriptToolsVersion>latest</TypeScriptToolsVersion>
 
 		<RootNamespace>GoogleAnalytics.Blazor</RootNamespace>
 		<AssemblyName>GoogleAnalytics.Blazor</AssemblyName>
-
+		
 		<IsPackable>true</IsPackable>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-		<Authors>isc30</Authors>
-		<Company>CodeIsc</Company>
+		<Authors>Simon Ziegler of Dioptra and Mark Stega of Optimium Health, forked from Blazor-Analytics (c) Ivan Sanz Carasa</Authors>
+		<Company>Material.Blazor</Company>
+		<Description>Blazor extensions for Google Analytics.</Description>
+		<RepositoryUrl>https://github.com/Material-Blazor/GoogleAnalytics.Blazor</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageReleaseNotes></PackageReleaseNotes>
+		<NeutralLanguage>en</NeutralLanguage>
+		<Copyright>Dioptra and Optimium Health</Copyright>
+		<PackageReleaseNotes></PackageReleaseNotes>
 		<PackageId>GoogleAnalytics.Blazor</PackageId>
 		<Product>GoogleAnalytics.Blazor</Product>
 		<Title>GoogleAnalytics.Blazor</Title>
-		<Description>Blazor extensions for Analytics. Supported platforms: Google Analytics, GTAG, ...</Description>
 		<PackageTags>blazor google analytics gtag extensions razor components</PackageTags>
-		<RepositoryUrl>https://github.com/isc30/blazor-analytics</RepositoryUrl>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryType>git</RepositoryType>
 	</PropertyGroup>
 

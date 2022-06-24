@@ -7,6 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoogleAnalytics.Blazor", "G
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Items", ".Solution Items", "{ACF4EFB9-CDAD-4B28-9C06-2EEB00CFEA60}"
 	ProjectSection(SolutionItems) = preProject
+		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
 		.github\workflows\GithubActionsRelease.yml = .github\workflows\GithubActionsRelease.yml
 		.github\workflows\GithubActionsWIP.yml = .github\workflows\GithubActionsWIP.yml
 		LICENSE = LICENSE
