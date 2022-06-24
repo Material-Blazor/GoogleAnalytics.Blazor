@@ -4,7 +4,7 @@
 
 Forked from [Blazor-Analytics](https://github.com/isc30/blazor-analytics), itself MIT License, Copyright (c) 2019 Ivan Sanz Carasa.
 
-Developed by [Materia-Blazor](https://material-blazor.com).
+Developed by [Material-Blazor](https://material-blazor.com).
 
 
 # Configuration
@@ -56,15 +56,15 @@ globally applicable [event params](https://developers.google.com/tag-platform/gt
 
 ```csharp diff
 +   builder.Services.AddGBService(
-        "[YOUR_GTAG_ID]",
-        additionalConfigInfo: new Dictionary<string, object>()
-        {
-            { "user_id", "[YOUR_USER_ID]" }
-        },
-        globalEventParams: new Dictionary<string, object>()
-        {
-            { "user_id", "YOUR_USER_ID" }
-        });
++       "[YOUR_GTAG_ID]",
++       additionalConfigInfo: new Dictionary<string, object>()
++       {
++           { "user_id", "[YOUR_USER_ID]" }
++       },
++       globalEventParams: new Dictionary<string, object>()
++       {
++           { "user_id", "YOUR_USER_ID" }
++       });
 ```
 
 You can set all three of these items using `IGBAnalyticsManager.SetTrackingId()`, `IGBAnalyticsManager.SetAdditionalConfigInfo()` and `IGBAnalyticsManager.SetGlobalEventParams()`
