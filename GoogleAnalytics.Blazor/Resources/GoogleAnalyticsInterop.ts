@@ -13,7 +13,7 @@ interface AdditionalConfigInfoObject {
     [key: string]: any
 }
 
-interface EventDataObject {
+interface EventParamsObject {
     [key: string]: any
 }
 
@@ -56,10 +56,10 @@ namespace GoogleAnalyticsInterop
         gtag("config", trackingId, configObject);
     }
 
-    export function trackEvent(eventName: string, eventData: EventDataObject, globalEventData: EventDataObject)
+    export function trackEvent(eventName: string, eventParams: EventParamsObject, globalEventParams: EventParamsObject)
     {
-        Object.assign(eventData, globalEventData)
+        Object.assign(eventParams, globalEventParams)
 
-        gtag("event", eventName, eventData);
+        gtag("event", eventName, eventParams);
     }
 }
