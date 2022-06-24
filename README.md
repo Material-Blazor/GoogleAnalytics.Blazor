@@ -6,6 +6,26 @@ Forked from [Blazor-Analytics](https://github.com/isc30/blazor-analytics), itsel
 
 Developed by [Material-Blazor](https://material-blazor.com).
 
+---
+
+
+[![NuGet version](https://img.shields.io/nuget/v/GoogleAnalytics.Blazor?logo=nuget&label=nuget%20version&style=flat-square)](https://www.nuget.org/packages/GoogleAnalytics.Blazor/)
+[![NuGet version](https://img.shields.io/nuget/vpre/GoogleAnalytics.Blazor?logo=nuget&label=nuget%20pre-release&style=flat-square)](https://www.nuget.org/packages/GoogleAnalytics.Blazor/)
+[![NuGet downloads](https://img.shields.io/nuget/dt/GoogleAnalytics.Blazor?logo=nuget&label=nuget%20downloads&style=flat-square)](https://www.nuget.org/packages/GoogleAnalytics.Blazor/)
+
+
+---
+
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?logo=github&style=flat-square)](/LICENSE.md)
+[![GitHub issues](https://img.shields.io/github/issues/Material-Blazor/GoogleAnalytics.Blazor?logo=github&style=flat-square)](https://github.com/Material-Blazor/GoogleAnalytics.Blazor/issues)
+[![GitHub forks](https://img.shields.io/github/forks/Material-Blazor/GoogleAnalytics.Blazor?logo=github&style=flat-square)](https://github.com/Material-Blazor/GoogleAnalytics.Blazor/network/members)
+[![GitHub stars](https://img.shields.io/github/stars/Material-Blazor/GoogleAnalytics.Blazor?logo=github&style=flat-square)](https://github.com/Material-Blazor/GoogleAnalytics.Blazor/stargazers)
+[![GitHub stars](https://img.shields.io/github/watchers/Material-Blazor/GoogleAnalytics.Blazor?logo=github&style=flat-square)](https://github.com/Material-Blazor/GoogleAnalytics.Blazor/watchers)
+
+[![GithubActionsMainPublish](https://img.shields.io/github/workflow/status/Material-Blazor/GoogleAnalytics.Blazor/GithubActionsRelease?label=actions%20release&logo=github&style=flat-square)](https://github.com/Material-Blazor/GoogleAnalytics.Blazor/actions?query=workflow%3AGithubActionsRelease)
+[![GithubActionsDevelop](https://img.shields.io/github/workflow/status/Material-Blazor/GoogleAnalytics.Blazor/GithubActionsWIP?label=actions%20wip&logo=github&style=flat-square)](https://github.com/Material-Blazor/GoogleAnalytics.Blazor/actions?query=workflow%3AGithubActionsWIP)
+
 
 # Configuration
 
@@ -126,23 +146,3 @@ protected override void OnInitialized()
 }
 ```
   
-
----
-
-
-[![NuGet version](https://img.shields.io/nuget/v/GoogleAnalytics.Blazor?logo=nuget&label=nuget%20version&style=flat-square)](https://www.nuget.org/packages/GoogleAnalytics.Blazor/)
-[![NuGet version](https://img.shields.io/nuget/vpre/GoogleAnalytics.Blazor?logo=nuget&label=nuget%20pre-release&style=flat-square)](https://www.nuget.org/packages/GoogleAnalytics.Blazor/)
-[![NuGet downloads](https://img.shields.io/nuget/dt/GoogleAnalytics.Blazor?logo=nuget&label=nuget%20downloads&style=flat-square)](https://www.nuget.org/packages/GoogleAnalytics.Blazor/)
-
-
----
-
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?logo=github&style=flat-square)](/LICENSE.md)
-[![GitHub issues](https://img.shields.io/github/issues/Material-Blazor/GoogleAnalytics.Blazor?logo=github&style=flat-square)](https://github.com/Material-Blazor/GoogleAnalytics.Blazor/issues)
-[![GitHub forks](https://img.shields.io/github/forks/Material-Blazor/GoogleAnalytics.Blazor?logo=github&style=flat-square)](https://github.com/Material-Blazor/GoogleAnalytics.Blazor/network/members)
-[![GitHub stars](https://img.shields.io/github/stars/Material-Blazor/GoogleAnalytics.Blazor?logo=github&style=flat-square)](https://github.com/Material-Blazor/GoogleAnalytics.Blazor/stargazers)
-[![GitHub stars](https://img.shields.io/github/watchers/Material-Blazor/GoogleAnalytics.Blazor?logo=github&style=flat-square)](https://github.com/Material-Blazor/GoogleAnalytics.Blazor/watchers)
-
-[![GithubActionsMainPublish](https://img.shields.io/github/workflow/status/Material-Blazor/GoogleAnalytics.Blazor/GithubActionsMainPublish?label=actions%20main&logo=github&style=flat-square)](https://github.com/Material-Blazor/GoogleAnalytics.Blazor/actions?query=workflow%3AGithubActionsMainPublish)
-[![GithubActionsDevelop](https://img.shields.io/github/workflow/status/Material-Blazor/GoogleAnalytics.Blazor/GithubActionsDevelop?label=actions%20develop&logo=github&style=flat-square)](https://github.com/Material-Blazor/GoogleAnalytics.Blazor/actions?query=workflow%3AGithubActionsDevelop)

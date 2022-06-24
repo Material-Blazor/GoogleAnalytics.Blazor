@@ -15,6 +15,8 @@ namespace GoogleAnalytics.Blazor;
 /// <inheritdoc/>
 public sealed class GBAnalyticsManager : IGBAnalyticsManager
 {
+    #region members
+
     private readonly IJSRuntime _jsRuntime;
     private readonly NavigationManager _navigationManager;
     private readonly ILogger<GBAnalyticsManager> _logger;
@@ -29,7 +31,9 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     private bool IsConfigured { get; set; } = false;
     private bool IsInitialized { get; set; } = false;
 
+    #endregion
 
+    #region _ctor
     public GBAnalyticsManager(IJSRuntime jsRuntime, NavigationManager navigationManager, ILogger<GBAnalyticsManager> logger)
     {
         _jsRuntime = jsRuntime;
@@ -38,8 +42,81 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
         
         _navigationManager.LocationChanged += OnLocationChanged;
     }
+    #endregion
 
+    #region ConfigureAsync
+    private async Task ConfigureAsync()
+    {
+        if (!IsInitialized)
+        {
+            return;
+        }
 
+        await _configurationSemaphore.WaitAsync().ConfigureAwait(false);
+
+        try
+        {
+            if (IsConfigured || string.IsNullOrWhiteSpace(TrackingId))
+            {
+                return;
+            }
+
+            await _jsRuntime.InvokeAsync<string>(GoogleAnalyticsInterop.Configure, TrackingId, AdditionalConfigInfo);
+
+            IsConfigured = true;
+
+            LogDebugMessage($"[GTAG][{TrackingId}] Configured");
+
+            await TrackNavigation(_navigationManager.Uri).ConfigureAwait(false);
+        }
+        finally
+        {
+            _configurationSemaphore.Release();
+        }
+    }
+    #endregion
+
+    #region DisableGlobalTracking
+    /// <inheritdoc/>
+    public void DisableGlobalTracking()
+    {
+        PerformGlobalTracking = false;
+    }
+    #endregion
+
+    #region EnableGlobalTracking
+    /// <inheritdoc/>
+    public void EnableGlobalTracking()
+    {
+        PerformGlobalTracking = true;
+    }
+    #endregion
+
+    #region GetAdditionalConfigInfo
+    /// <inheritdoc/>
+    public ImmutableDictionary<string, object> GetAdditionalConfigInfo()
+    {
+        return AdditionalConfigInfo;
+    }
+    #endregion
+
+    #region GetGlobalEventParams
+    /// <inheritdoc/>
+    public ImmutableDictionary<string, object> GetGlobalEventParams()
+    {
+        return GlobalEventParams;
+    }
+    #endregion
+
+    #region GetTrackingId
+    /// <inheritdoc/>
+    public string GetTrackingId()
+    {
+        return TrackingId ?? "";
+    }
+    #endregion
+
+    #region Initialize
     /// <summary>
     /// Initializes the service. No tracking will be performed until this is called by <see cref="GBAnchor"/>;
     /// </summary>
@@ -49,40 +126,38 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
 
         await ConfigureAsync().ConfigureAwait(false);
     }
+    #endregion
 
-
+    #region IsGlobalTrackingEnabled
     /// <inheritdoc/>
-    public async Task SetTrackingId(string trackingId)
+    public bool IsGlobalTrackingEnabled()
     {
-        if (TrackingId == trackingId)
-        {
-            return;
-        }
-
-        await _setPropertySemaphore.WaitAsync().ConfigureAwait(false);
-
-        try
-        {
-            TrackingId = trackingId;
-
-            IsConfigured = false;
-
-            await ConfigureAsync().ConfigureAwait(false);
-        }
-        finally
-        {
-            _setPropertySemaphore.Release();
-        }
+        return PerformGlobalTracking;
     }
+    #endregion
 
-
-    /// <inheritdoc/>
-    public string GetTrackingId()
+    #region LogDebugMessage
+    private void LogDebugMessage(string message)
     {
-        return TrackingId ?? "";
+        _logger.LogDebug(message);
     }
+    #endregion
 
+    #region OnLocationChanged
+    private async void OnLocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        await ConfigureAsync().ConfigureAwait(false);
 
+        if (!SuppressNextPageHit)
+        {
+            await TrackNavigation(args.Location);
+        }
+
+        SuppressNextPageHit = false;
+    }
+    #endregion
+
+    #region SetAdditionalConfigInfo
     /// <inheritdoc/>
     public async Task SetAdditionalConfigInfo(IDictionary<string, object> additionalConfigInfo)
     {
@@ -123,47 +198,67 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
             _setPropertySemaphore.Release();
         }
     }
+    #endregion
 
-
-    /// <inheritdoc/>
-    public ImmutableDictionary<string, object> GetAdditionalConfigInfo()
-    {
-        return AdditionalConfigInfo;
-    }
-
-
+    #region SetGlobalEventParams
     /// <inheritdoc/>
     public void SetGlobalEventParams(IDictionary<string, object> globalEventParams)
     {
         GlobalEventParams = globalEventParams.OrderBy(x => x.Key).ToImmutableDictionary();
     }
+    #endregion
 
-
+    #region SetTrackingId
     /// <inheritdoc/>
-    public ImmutableDictionary<string, object> GetGlobalEventParams()
+    public async Task SetTrackingId(string trackingId)
     {
-        return GlobalEventParams;
+        if (TrackingId == trackingId)
+        {
+            return;
+        }
+
+        await _setPropertySemaphore.WaitAsync().ConfigureAwait(false);
+
+        try
+        {
+            TrackingId = trackingId;
+
+            IsConfigured = false;
+
+            await ConfigureAsync().ConfigureAwait(false);
+        }
+        finally
+        {
+            _setPropertySemaphore.Release();
+        }
     }
+    #endregion
 
+    #region SuppressNextPageHitTracking
+    /// <inheritdoc/>
+    public void SuppressNextPageHitTracking()
+    {
+        SuppressNextPageHit = true;
+    }
+    #endregion
 
+    #region TrackEvent
     /// <inheritdoc/>
     public async Task TrackEvent(string eventName, string eventCategory = null, string eventLabel = null, int? eventValue = null)
     {
         await TrackEvent(eventName, new
         {
-            event_category = eventCategory, 
-            event_label = eventLabel, 
+            event_category = eventCategory,
+            event_label = eventLabel,
             value = eventValue
         }).ConfigureAwait(false);
     }
-
 
     /// <inheritdoc/>
     public Task TrackEvent(string eventName, int eventValue, string eventCategory = null, string eventLabel = null)
     {
         return TrackEvent(eventName, eventCategory, eventLabel, eventValue);
     }
-
 
     /// <inheritdoc/>
     public async Task TrackEvent(string eventName, object eventData)
@@ -178,84 +273,13 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
             await ConfigureAsync().ConfigureAwait(false);
         }
 
-        await _jsRuntime.InvokeAsync<string>( GoogleAnalyticsInterop.TrackEvent, eventName, eventData, GlobalEventParams).ConfigureAwait(false);
+        await _jsRuntime.InvokeAsync<string>(GoogleAnalyticsInterop.TrackEvent, eventName, eventData, GlobalEventParams).ConfigureAwait(false);
 
         LogDebugMessage($"[GTAG][Event triggered] '{eventName}, {eventData}'");
     }
+    #endregion
 
-
-    /// <inheritdoc/>
-    public void EnableGlobalTracking()
-    {
-        PerformGlobalTracking = true;
-    }
-
-
-    /// <inheritdoc/>
-    public void DisableGlobalTracking()
-    {
-        PerformGlobalTracking = false;
-    }
-
-
-    /// <inheritdoc/>
-    public bool IsGlobalTrackingEnabled()
-    {
-        return PerformGlobalTracking;
-    }
-
-
-    /// <inheritdoc/>
-    public void SuppressNextPageHitTracking()
-    {
-        SuppressNextPageHit = true;
-    }
-
-
-    private async Task ConfigureAsync()
-    {
-        if (!IsInitialized)
-        {
-            return;
-        }
-
-        await _configurationSemaphore.WaitAsync().ConfigureAwait(false);
-
-        try
-        {
-            if (IsConfigured || string.IsNullOrWhiteSpace(TrackingId))
-            {
-                return;
-            }
-
-            await _jsRuntime.InvokeAsync<string>(GoogleAnalyticsInterop.Configure, TrackingId, AdditionalConfigInfo);
-
-            IsConfigured = true;
-
-            LogDebugMessage($"[GTAG][{TrackingId}] Configured");
-
-            await TrackNavigation(_navigationManager.Uri).ConfigureAwait(false);
-        }
-        finally
-        {
-            _configurationSemaphore.Release();
-        }
-    }
-
-
-    private async void OnLocationChanged(object sender, LocationChangedEventArgs args)
-    {
-        await ConfigureAsync().ConfigureAwait(false);
-        
-        if (!SuppressNextPageHit)
-        {
-            await TrackNavigation(args.Location);
-        }
-
-        SuppressNextPageHit = false;
-    }
-
-
+    #region TrackNavigation
     private async Task TrackNavigation(string uri)
     {
         if (!IsConfigured || !PerformGlobalTracking)
@@ -267,10 +291,5 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
 
         LogDebugMessage($"[GTAG][{TrackingId}] Navigated: '{uri}'");
     }
-
-
-    private void LogDebugMessage(string message)
-    {
-        _logger.LogDebug(message);
-    }
+    #endregion
 }
