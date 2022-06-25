@@ -26,8 +26,8 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     private bool PerformGlobalTracking { get; set; } = true;
     private bool SuppressNextPageHit { get; set; } = false;
     private string TrackingId { get; set; } = null;
-    private ImmutableDictionary<string, object> AdditionalConfigInfo { get; set; } = ImmutableDictionary<string, object>.Empty;
-    private ImmutableDictionary<string, object> GlobalEventParams { get; set; } = ImmutableDictionary<string, object>.Empty;
+    private Dictionary<string, object> AdditionalConfigInfo { get; set; } = new();
+    private Dictionary<string, object> GlobalEventParams { get; set; } = new();
     private bool IsConfigured { get; set; } = false;
     private bool IsInitialized { get; set; } = false;
 
@@ -96,7 +96,7 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     /// <inheritdoc/>
     public ImmutableDictionary<string, object> GetAdditionalConfigInfo()
     {
-        return AdditionalConfigInfo;
+        return AdditionalConfigInfo.ToImmutableDictionary();
     }
     #endregion
 
@@ -104,7 +104,7 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     /// <inheritdoc/>
     public ImmutableDictionary<string, object> GetGlobalEventParams()
     {
-        return GlobalEventParams;
+        return GlobalEventParams.ToImmutableDictionary();
     }
     #endregion
 
@@ -163,7 +163,7 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     {
         try
         {
-            var newDict = additionalConfigInfo.OrderBy(x => x.Key).ToImmutableDictionary();
+            var newDict = additionalConfigInfo.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
 
             var isNew = newDict.Count != AdditionalConfigInfo.Count;
 
@@ -204,7 +204,7 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     /// <inheritdoc/>
     public void SetGlobalEventParams(IDictionary<string, object> globalEventParams)
     {
-        GlobalEventParams = globalEventParams.OrderBy(x => x.Key).ToImmutableDictionary();
+        GlobalEventParams = globalEventParams.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
     }
     #endregion
 
