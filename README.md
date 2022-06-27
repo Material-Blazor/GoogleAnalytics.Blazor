@@ -40,7 +40,7 @@ First, import the namespaces in `_Imports.razor`
 Then, add the `GBAnchor` component to the end of `App.razor`.
 
 ```csharp diff
-+   <NavigationTracker />
++   <GBAnchor />
 ```
 
 ## ServerSide Specific Configuration
