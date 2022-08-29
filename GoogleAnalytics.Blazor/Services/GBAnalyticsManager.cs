@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -7,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
 
 namespace GoogleAnalytics.Blazor;
@@ -22,23 +22,34 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     private readonly ILogger<GBAnalyticsManager> _logger;
     private readonly SemaphoreSlim _configurationSemaphore = new(1, 1);
     private readonly SemaphoreSlim _setPropertySemaphore = new(1, 1);
+    
+    
+    private string TrackingId { get; set; } = null;
+    private ImmutableDictionary<string, object> AdditionalConfigInfo { get; set; }
+    private ImmutableDictionary<string, object> GlobalEventParams { get; set; }
+
 
     private bool PerformGlobalTracking { get; set; } = true;
     private bool SuppressNextPageHit { get; set; } = false;
-    private string TrackingId { get; set; } = null;
-    private Dictionary<string, object> AdditionalConfigInfo { get; set; } = new();
-    private Dictionary<string, object> GlobalEventParams { get; set; } = new();
     private bool IsConfigured { get; set; } = false;
     private bool IsInitialized { get; set; } = false;
 
     #endregion
 
     #region _ctor
-    public GBAnalyticsManager(IJSRuntime jsRuntime, NavigationManager navigationManager, ILogger<GBAnalyticsManager> logger)
+    public GBAnalyticsManager(IJSRuntime jsRuntime, NavigationManager navigationManager, ILogger<GBAnalyticsManager> logger, IOptions<GBOptions> options)
     {
         _jsRuntime = jsRuntime;
         _navigationManager = navigationManager;
         _logger = logger;
+        
+        var gbOptions = options.Value;
+
+        gbOptions ??= new();
+
+        TrackingId = gbOptions.TrackingId;
+        AdditionalConfigInfo = gbOptions.AdditionalConfigInfo?.ToImmutableDictionary() ?? ImmutableDictionary<string, object>.Empty;
+        GlobalEventParams = gbOptions.GlobalEventParams?.ToImmutableDictionary() ?? ImmutableDictionary<string, object>.Empty;
         
         _navigationManager.LocationChanged += OnLocationChanged;
     }
@@ -96,7 +107,7 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     /// <inheritdoc/>
     public ImmutableDictionary<string, object> GetAdditionalConfigInfo()
     {
-        return AdditionalConfigInfo.ToImmutableDictionary();
+        return AdditionalConfigInfo;
     }
     #endregion
 
@@ -104,7 +115,7 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     /// <inheritdoc/>
     public ImmutableDictionary<string, object> GetGlobalEventParams()
     {
-        return GlobalEventParams.ToImmutableDictionary();
+        return GlobalEventParams;
     }
     #endregion
 
@@ -112,7 +123,7 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     /// <inheritdoc/>
     public string GetTrackingId()
     {
-        return TrackingId ?? "";
+        return TrackingId;
     }
     #endregion
 
@@ -186,7 +197,7 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
 
             if (isNew)
             {
-                AdditionalConfigInfo = newDict;
+                AdditionalConfigInfo = newDict.ToImmutableDictionary();
 
                 IsConfigured = false;
 
@@ -204,7 +215,7 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
     /// <inheritdoc/>
     public void SetGlobalEventParams(IDictionary<string, object> globalEventParams)
     {
-        GlobalEventParams = globalEventParams.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
+        GlobalEventParams = globalEventParams.OrderBy(x => x.Key).ToImmutableDictionary(x => x.Key, x => x.Value);
     }
     #endregion
 

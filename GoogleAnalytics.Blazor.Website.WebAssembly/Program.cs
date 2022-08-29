@@ -14,16 +14,12 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-builder.Services.AddGBService(
-    "UA-111742878-2",
-    additionalConfigInfo: new Dictionary<string, object>()
-    {
-        { "user_id", userId }
-    },
-    globalEventParams: new Dictionary<string, object>()
-    {
-        { "user_id", userId }
-    });
+builder.Services.AddGBService(options =>
+{
+    options.TrackingId = "UA-111742878-2";
+    options.AdditionalConfigInfo = new Dictionary<string, object>() { { "user_id", userId } };
+    options.GlobalEventParams = new Dictionary<string, object>() { { "user_id", userId } };
+});
 
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 

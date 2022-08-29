@@ -19,16 +19,12 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 
-builder.Services.AddGBService(
-    "UA-111742878-2",
-    additionalConfigInfo: new Dictionary<string, object>()
-    {
-        { "user_id", userId }
-    },
-    globalEventParams: new Dictionary<string, object>()
-    {
-        { "user_id", userId }
-    });
+builder.Services.AddGBService(options =>
+{
+    options.TrackingId = "UA-111742878-2";
+    options.AdditionalConfigInfo = new Dictionary<string, object>() { { "user_id", userId } };
+    options.GlobalEventParams = new Dictionary<string, object>() { { "user_id", userId } };
+});
 
 var app = builder.Build();
 

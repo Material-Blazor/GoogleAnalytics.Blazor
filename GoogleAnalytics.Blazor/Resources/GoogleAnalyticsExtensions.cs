@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System.Collections;
-using System.Collections.Generic;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace GoogleAnalytics.Blazor;
 
@@ -13,32 +11,17 @@ public static class GoogleAnalyticsExtensions
     /// <summary>
     /// Adds a scoped service to manage Google Analytics.
     /// </summary>
-    /// <param name="services"></param>
+    /// <param name="serviceCollection"></param>
     /// <param name="trackingId"></param>
     /// <param name="additionalConfigInfo">See <see href="https://developers.google.com/tag-platform/gtagjs/reference#config"/></param>
     /// <returns></returns>
-    public static IServiceCollection AddGBService(this IServiceCollection services, string trackingId = null, IDictionary<string, object> additionalConfigInfo = null, IDictionary<string, object> globalEventParams = null)
+    public static IServiceCollection AddGBService(this IServiceCollection serviceCollection, Action<GBOptions> configureOptions = null)
     {
-        return services.AddScoped<IGBAnalyticsManager>(p =>
+        configureOptions ??= options => options = new GBOptions();
+
+        return serviceCollection.AddScoped<IGBAnalyticsManager>(serviceProvider =>
         {
-            var googleAnalytics = ActivatorUtilities.CreateInstance<GBAnalyticsManager>(p);
-
-            if (!string.IsNullOrWhiteSpace(trackingId))
-            {
-                _ = googleAnalytics.SetTrackingId(trackingId);
-            }
-
-            if (additionalConfigInfo != null)
-            {
-                _ = googleAnalytics.SetAdditionalConfigInfo(additionalConfigInfo);
-            }
-
-            if (globalEventParams != null)
-            {
-                googleAnalytics.SetGlobalEventParams(globalEventParams);
-            }
-
-            return googleAnalytics;
+            return ActivatorUtilities.CreateInstance<GBAnalyticsManager>(serviceProvider);
         });
     }
 }
