@@ -38,19 +38,22 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
 
     #region _ctor
     public GBAnalyticsManager(IJSRuntime jsRuntime, NavigationManager navigationManager, ILogger<GBAnalyticsManager> logger, IOptions<GBOptions> options)
+        : this (jsRuntime, navigationManager, logger, options.Value)
+    {
+
+    }
+
+
+    public GBAnalyticsManager(IJSRuntime jsRuntime, NavigationManager navigationManager, ILogger<GBAnalyticsManager> logger, GBOptions options)
     {
         _jsRuntime = jsRuntime;
         _navigationManager = navigationManager;
         _logger = logger;
-        
-        var gbOptions = options.Value;
 
-        gbOptions ??= new();
+        TrackingId = options.TrackingId;
+        AdditionalConfigInfo = options.AdditionalConfigInfo?.ToImmutableDictionary() ?? ImmutableDictionary<string, object>.Empty;
+        GlobalEventParams = options.GlobalEventParams?.ToImmutableDictionary() ?? ImmutableDictionary<string, object>.Empty;
 
-        TrackingId = gbOptions.TrackingId;
-        AdditionalConfigInfo = gbOptions.AdditionalConfigInfo?.ToImmutableDictionary() ?? ImmutableDictionary<string, object>.Empty;
-        GlobalEventParams = gbOptions.GlobalEventParams?.ToImmutableDictionary() ?? ImmutableDictionary<string, object>.Empty;
-        
         _navigationManager.LocationChanged += OnLocationChanged;
     }
     #endregion

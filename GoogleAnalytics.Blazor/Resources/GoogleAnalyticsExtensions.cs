@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System;
 
 namespace GoogleAnalytics.Blazor;
@@ -12,16 +13,31 @@ public static class GoogleAnalyticsExtensions
     /// Adds a scoped service to manage Google Analytics.
     /// </summary>
     /// <param name="serviceCollection"></param>
-    /// <param name="trackingId"></param>
-    /// <param name="additionalConfigInfo">See <see href="https://developers.google.com/tag-platform/gtagjs/reference#config"/></param>
     /// <returns></returns>
-    public static IServiceCollection AddGBService(this IServiceCollection serviceCollection, Action<GBOptions> configureOptions = null)
+    public static IServiceCollection AddGBService(this IServiceCollection serviceCollection)
     {
-        configureOptions ??= options => options = new GBOptions();
+        return serviceCollection.AddScoped<IGBAnalyticsManager>(serviceProvider =>
+        {
+            return ActivatorUtilities.CreateInstance<GBAnalyticsManager>(serviceProvider, serviceProvider.GetRequiredService<IOptions<GBOptions>>());
+        });
+    }
+
+
+    /// <summary>
+    /// Adds a scoped service to manage Google Analytics.
+    /// </summary>
+    /// <param name="serviceCollection"></param>
+    /// <param name="configureOptions"></param>
+    /// <returns></returns>
+    public static IServiceCollection AddGBService(this IServiceCollection serviceCollection, Action<GBOptions> configureOptions)
+    {
+        GBOptions options = new();
+
+        configureOptions.Invoke(options);
 
         return serviceCollection.AddScoped<IGBAnalyticsManager>(serviceProvider =>
         {
-            return ActivatorUtilities.CreateInstance<GBAnalyticsManager>(serviceProvider);
+            return ActivatorUtilities.CreateInstance<GBAnalyticsManager>(serviceProvider, options);
         });
     }
 }
