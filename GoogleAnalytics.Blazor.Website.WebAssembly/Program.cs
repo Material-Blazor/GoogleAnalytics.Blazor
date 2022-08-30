@@ -3,6 +3,7 @@ using GoogleAnalytics.Blazor.Website.WebAssembly;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Serilog;
+using Serilog.Events;
 using Serilog.Extensions.Logging;
 
 var userId = $"userid{DateTime.Now.Ticks}";
@@ -36,7 +37,7 @@ builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
-    //.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
     //.MinimumLevel.Override("GoogleAnalytics.Blazor", LogEventLevel.Debug)
     .Enrich.FromLogContext()
     .WriteTo.Async(a => a.BrowserConsole(outputTemplate: "{Timestamp:HH:mm:ss.fff}\t[{Level:u3}]\t{Message}{NewLine}{Exception}"))

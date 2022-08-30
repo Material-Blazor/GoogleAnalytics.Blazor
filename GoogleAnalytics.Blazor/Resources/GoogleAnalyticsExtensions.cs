@@ -16,6 +16,11 @@ public static class GoogleAnalyticsExtensions
     /// <returns></returns>
     public static IServiceCollection AddGBService(this IServiceCollection serviceCollection)
     {
+        if (serviceCollection == null)
+        {
+            throw new ArgumentNullException(nameof(serviceCollection));
+        }
+
         return serviceCollection.AddScoped<IGBAnalyticsManager>(serviceProvider =>
         {
             return ActivatorUtilities.CreateInstance<GBAnalyticsManager>(serviceProvider, serviceProvider.GetRequiredService<IOptions<GBOptions>>());
@@ -31,6 +36,16 @@ public static class GoogleAnalyticsExtensions
     /// <returns></returns>
     public static IServiceCollection AddGBService(this IServiceCollection serviceCollection, Action<GBOptions> configureOptions)
     {
+        if (serviceCollection == null)
+        {
+            throw new ArgumentNullException(nameof(serviceCollection));
+        }
+
+        if (configureOptions == null)
+        {
+            throw new ArgumentNullException(nameof(configureOptions));
+        }
+
         GBOptions options = new();
 
         configureOptions.Invoke(options);
