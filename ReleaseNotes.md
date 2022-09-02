@@ -15,4 +15,3 @@ First full release of GoogleAnalytics.Blazor.
 **Breaking Changes**
 
 **Known issues**
-
