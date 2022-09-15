@@ -75,7 +75,7 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
                 return;
             }
 
-            await _jsRuntime.InvokeAsync<string>(GoogleAnalyticsInterop.Configure, TrackingId, AdditionalConfigInfo.ToDictionary());
+            await _jsRuntime.InvokeAsync<string>(GoogleAnalyticsInterop.Configure, TrackingId, AdditionalConfigInfo.ToDictionary(x => x.Key, x => x.Value));
 
             IsConfigured = true;
 
@@ -287,7 +287,7 @@ public sealed class GBAnalyticsManager : IGBAnalyticsManager
             await ConfigureAsync().ConfigureAwait(false);
         }
 
-        await _jsRuntime.InvokeAsync<string>(GoogleAnalyticsInterop.TrackEvent, eventName, eventData, GlobalEventParams.ToDictionary()).ConfigureAwait(false);
+        await _jsRuntime.InvokeAsync<string>(GoogleAnalyticsInterop.TrackEvent, eventName, eventData, GlobalEventParams.ToDictionary(x => x.Key, x => x.Value)).ConfigureAwait(false);
 
         LogDebugMessage($"[GTAG][Event triggered] '{eventName}, {eventData}'");
     }
