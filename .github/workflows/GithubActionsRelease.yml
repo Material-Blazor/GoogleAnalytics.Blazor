@@ -41,38 +41,6 @@ jobs:
       run: echo ""
 
 ############################################################################################################
-# Store the version information
-############################################################################################################
-  version:
-    name: Set version identifier
-    runs-on: ubuntu-latest
-
-    steps:
-    - id: get
-      run: |
-        echo "::set-output name=identifier::${GITHUB_REF/refs\/tags\//}"
-    - id: show
-      run: |
-        echo "${{ steps.get.outputs.identifier }}"
-    outputs:
-      identifier: ${{ steps.get.outputs.identifier }}
-############################################################################################################
-# Store the branch information
-############################################################################################################
-  branch:
-    name: Set branch identifier
-    runs-on: ubuntu-latest
-    steps:
-    - id: get
-      run: |
-        echo "::set-output name=identifier::${GITHUB_REF/refs\/heads\//}"
-    - id: show
-      run: |
-        echo "${{ steps.get.outputs.identifier }}"
-    outputs:
-      identifier: ${{ steps.get.outputs.identifier }}
-
-############################################################################################################
 # Build GA.B
 ############################################################################################################
   build-gab:
@@ -81,6 +49,10 @@ jobs:
     runs-on: windows-latest
 
     steps:
+    - name: Get the version
+      run: echo "version=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+      shell: bash
+
     - name: Checkout repository under $GITHUB_WORKSPACE so the job can access it 🛎️
       uses: actions/checkout@v3
       with:
@@ -93,13 +65,13 @@ jobs:
         include-prerelease: true
 
     - name: Build and Publish 🔧
-      run: dotnet publish ${{env.project}} --configuration ${{env.buildConfiguration}} --output ${{env.output}} -p:Version=${{needs.version.outputs.identifier}} -p:BlazorEnableCompression=false      
+      run: dotnet publish ${{env.project}} --configuration ${{env.buildConfiguration}} --output ${{env.output}} -p:Version=${{env.version}} -p:BlazorEnableCompression=false      
 
     - name: Build GoogleAnalytics.Blazor 🔧
-      run: dotnet build ${{env.project}} --configuration ${{env.buildConfiguration}} -p:Version=${{needs.version.outputs.identifier}}
+      run: dotnet build ${{env.project}} --configuration ${{env.buildConfiguration}} -p:Version=${{env.version}}
 
     - name: Generate the NuGet package 🔧
-      run: dotnet pack ${{env.projectMB}} --configuration ${{env.buildConfiguration}} --output ${{env.output}} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:Version=${{needs.version.outputs.identifier}}
+      run: dotnet pack ${{env.projectMB}} --configuration ${{env.buildConfiguration}} --output ${{env.output}} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:Version=${{env.version}}
 
     - name: Display package output Ꙫ
       run: dir ${{env.output}}
@@ -118,12 +90,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Get the version
+      run: echo "version=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+      shell: bash
+
     - name: Create Release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{needs.version.outputs.identifier}}
-        release_name: Release ${{needs.version.outputs.identifier}}
+        tag_name: ${{env.version}}
+        release_name: Release ${{env.version}}
         draft: false
         prerelease: false
