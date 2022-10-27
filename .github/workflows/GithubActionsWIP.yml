@@ -48,20 +48,3 @@ jobs:
 
     - name: Display package output Ꙫ
       run: dir ${{env.output}}
-
-# We'd like to push to a the main repository but now getting errors of authorization
-
-    - name: Upload Package (Main repository) 🔺
-      run: nuget push ${{env.output}}\*.nupkg -Source https://nuget.pkg.github.com/${{github.repository_owner}}/index.json
-      env:
-        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      if: (github.repository == 'Material-Blazor/GoogleAnalytics.Blazor') && (github.event_name == 'push') && false
-
-# We'd like to push to a forked repository; The push appears to work but the packages are not visible
-# Pending a service response we only do the push of the CI build in the Material-Blazor/GoogleAnalytics.Blazor repository
-
-    - name: Upload Package (Forked repository) 🔺
-      run: nuget push ${{env.output}}\*.nupkg -Source https://nuget.pkg.github.com/${{github.repository_owner}}/index.json
-      env:
-        NUGET_AUTH_TOKEN: ${{secrets.GH_PAT}}
-      if: (github.repository != 'Material-Blazor/GoogleAnalytics.Blazor') && (github.event_name == 'push') && false

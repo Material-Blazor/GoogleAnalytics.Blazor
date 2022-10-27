@@ -44,7 +44,7 @@ jobs:
 # Build GA.B
 ############################################################################################################
   build-gab:
-    needs: [version, is-on-ga-blazor]
+    needs: [is-on-ga-blazor]
     name: Build GoogleAnalytics.Blazor
     runs-on: windows-latest
 
@@ -85,7 +85,7 @@ jobs:
 ############################################################################################################
   create-release:
     name: Create release
-    needs: [build-gab, branch, version, is-on-ga-blazor]
+    needs: [build-gab, is-on-ga-blazor]
 
     runs-on: ubuntu-latest
 
