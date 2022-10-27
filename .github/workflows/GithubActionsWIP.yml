@@ -41,10 +41,10 @@ jobs:
         include-prerelease: true
 
     - name: Publish GA.B 🔧
-      run: dotnet publish ${{env.project}} --configuration ${{env.buildConfiguration}} --output ${{env.output}} --version-suffix ${{env.version}} -p:BlazorEnableCompression=false
+      run: dotnet publish ${{env.project}} --configuration ${{env.buildConfiguration}} --output ${{env.output}} --version-suffix 1.0.0-${{env.ciSuffix}} -p:BlazorEnableCompression=false
 
     - name: Generate the NuGet package 🔧
-      run: dotnet pack ${{env.project}} --no-build --configuration ${{env.buildConfiguration}} --output ${{env.output}} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:Version=1.0.0-${{env.version}}
+      run: dotnet pack ${{env.project}} --no-build --configuration ${{env.buildConfiguration}} --output ${{env.output}} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:Version=1.0.0-${{env.ciSuffix}}
 
     - name: Display package output Ꙫ
       run: dir ${{env.output}}
