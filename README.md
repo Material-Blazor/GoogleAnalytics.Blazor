@@ -23,8 +23,8 @@ Developed by [Material-Blazor](https://material-blazor.com).
 [![GitHub stars](https://img.shields.io/github/stars/Material-Blazor/GoogleAnalytics.Blazor?logo=github&style=flat-square)](https://github.com/Material-Blazor/GoogleAnalytics.Blazor/stargazers)
 [![GitHub stars](https://img.shields.io/github/watchers/Material-Blazor/GoogleAnalytics.Blazor?logo=github&style=flat-square)](https://github.com/Material-Blazor/GoogleAnalytics.Blazor/watchers)
 
-[![GithubActionsMainPublish](https://img.shields.io/github/workflow/status/Material-Blazor/GoogleAnalytics.Blazor/GithubActionsRelease?label=actions%20release&logo=github&style=flat-square)](https://github.com/Material-Blazor/GoogleAnalytics.Blazor/actions?query=workflow%3AGithubActionsRelease)
-[![GithubActionsDevelop](https://img.shields.io/github/workflow/status/Material-Blazor/GoogleAnalytics.Blazor/GithubActionsWIP?label=actions%20wip&logo=github&style=flat-square)](https://github.com/Material-Blazor/GoogleAnalytics.Blazor/actions?query=workflow%3AGithubActionsWIP)
+[![GithubActionsRelease](https://img.shields.io/github/actions/workflow/status/Material-Blazor/GoogleAnalytics.Blazor/GithubActionsRelease.yml?label=actions%20release&logo=github&style=flat-square)](https://github.com/Material-Blazor/HttpSecurity.AspNet/actions/workflows/GithubActionsRelease.yml)
+[![GithubActionsWIP](https://img.shields.io/github/actions/workflow/status/Material-Blazor/GoogleAnalytics.Blazor/GithubActionsWIP.yml?label=actions%20wip&logo=github&style=flat-square)](https://github.com/Material-Blazor/HttpSecurity.AspNet/actions/workflows/GithubActionsWIP.yml)
 
 
 # Configuration
